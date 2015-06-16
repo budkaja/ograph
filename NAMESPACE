@@ -1,0 +1,15 @@
+exportPattern("^[[:alpha:]]+")
+
+exportClasses(ontGraph )
+
+exportMethods(initialize)
+
+export(buildOntGraph,buildLevels,
+       subGraphByLevel,subGraphByNodes,
+       node.addColorAttributeByLevel, node.addLevelAttribute,node.addLeafAttribute,
+       findLeafNode,findRoot,findParentNodes,findAllParentNodes,
+       shortest_path_to_root,get.node.attribute,set.node.attribute,
+       reverseArch,findInducedSubGraphNodes,
+       mapGene2Graph,mapGene2Graph2,rollUpAnnotation,rollUpAnnotation2,.get.genesInNodes,rollUpToLevel,
+       treeplot,nomalplot,peekNode,entrez2symbol
+  )
