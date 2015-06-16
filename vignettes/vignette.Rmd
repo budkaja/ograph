@@ -1,0 +1,97 @@
+---
+title: "oGraph"
+author: "Xin He"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+%\VignetteIndexEntry{oGraph}
+%\VignetteEngine{knitr::rmarkdown}
+\usepackage[utf8]{inputenc}
+---
+  
+# Overview
+oGraph is a package for ontology representation and visualization. 
+
+# Quick start guide
+This section describes a simple working session using **oGraph**. 
+
+A typical session can be divided into two steps:
+  
+1.  *Data preparation* build the oGraph object which has the ontology store in an underlying igraph object.
+
+2.  *Running analysis* treeview, subtree, find parent/child terms...
+
+
+Here are example vignettes:
+
+```{r 1,message=FALSE}
+library('ograph')
+ograph::initOGraph('HDO')
+```
+
+```{r 2,message=FALSE}
+ontGraph<-new("ontGraph",ontology='HDO')
+print(ontGraph)
+g=ontGraph@graph
+root=findRoot(graph=g)
+leaves=findLeafNode(graph=g)
+treeplot(g,label=0)
+
+nodes=shortest_path_to_root(graph=g,node='DOID:10652')
+g2=set.node.attribute(g,attr_name='color',attr_value='red',nodes=nodes)
+treeplot(g2,label=0)
+```
+</center>
+
+
+```{r}
+subg<-subGraphByLevel(graph=g,l=3)
+treeplot(subg,label=1)
+```
+  
+```{r}
+terms=c('DOID:10652','DOID:14330')
+list.vertex.attributes(graph=g)
+get.node.attribute(g,attr='def',nodes=terms)
+subg<-subGraphByNodes(graph=g,nodes=terms)
+treeplot(subg,label=1)
+```
+
+
+```{r}
+subg=mapGene2Graph(graph=subg,file=system.file("extdata","human_gene2HDO_o", package ="ograph"))
+treeplot(subg,label=1,show.genes=TRUE)
+```
+
+
+```{r}
+term='DOID:150'
+get.node.attribute(g,attr='def',nodes=term)
+peekNode(g,node=term)
+
+findParentNodes(graph=g,node=term)
+findChildrenNodes(graph=g,node=term)
+
+cs=findAllChildrenNodes(g,term)
+g.cs=subGraphByNodes(graph=g,nodes=cs,include_path_to_root=TRUE)
+treeplot(g.cs,label=0)
+
+ps=findAllParentNodes(g,term)
+g.ps=subGraphByNodes(graph=g,nodes=ps,include_path_to_root=TRUE)
+treeplot(g.ps,label=1)
+```
+
+
+```{r}
+clip_neuro=searchDescription4Keyword(graph=g,keys=c('neuro'))
+names=searchName4Keyword(g,keys=c('neuro'))
+get.node.attribute(g,attr='def',names)
+
+clip_brain=searchDescription4Keyword(graph=g,keys=c('brain'))
+g.clip=subGraphByNodes(g,nodes=unique(c(clip_brain,clip_neuro)))
+g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='green',nodes=clip_neuro)
+g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='blue',nodes=clip_brain)
+g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='red',nodes=intersect(clip_brain,clip_neuro))
+
+treeplot(g.clip,label=0)
+```
