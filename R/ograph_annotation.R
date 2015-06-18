@@ -264,9 +264,12 @@ saveAnnotationFromGraph<-function(graph,file){
 }
 
 ##################################
-#
-entrez2symbol<-function(file){
-  lines<-read.delim("/home/xin/Desktop/entrez2symbol.txt",header=TRUE,sep=",")
+#map entrez id two gene symbol
+entrez2symbol<-function(file=''){  
+  if(file=='')
+    file=system.file("extdata","entrez2symbol.txt", package ="ograph")
+  
+  lines<-read.delim(file,header=TRUE,sep=",")
   index<-which(!as.vector(lines$HGNC.symbol) %in% '')
   entrez_ids<-as.vector(lines$EntrezGene.ID)[index]
   symbols<-as.vector(lines$HGNC.symbol)[index]

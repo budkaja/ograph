@@ -42,7 +42,7 @@ nomalplot<-function(graph,label=0){
 ##plot2file(filename,width=50,heigth=20)
 ##plotSig(graph=g@graph,testresult=resultElimFis,number_of_node=50,label=1)
 ##dev.off()
-plotSig<-function(graph,value,label=1,number_of_node=0,){
+plotSig<-function(graph,value,label=1,number_of_node=0,...){
   x=sort(testresult+0.00001)
   #x=sort(score(testresult))
   
@@ -60,7 +60,7 @@ plotSig<-function(graph,value,label=1,number_of_node=0,){
   
   g=subGraphByNodes(graph,nodes=names(x))
   g=ograph::set.node.attribute(g,attr_name='color',attr_value=color,nodes=names(color))
-  treeplot(g,label=label,vertex.size=5,vertex.label.cex=1)
+  treeplot(g,label=label,vertex.size=5,vertex.label.cex=1,...)
 }
 
 ##################################
