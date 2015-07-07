@@ -129,14 +129,19 @@ loadGraph<-function(edges_file,nodes_file){
 ##################################
 ##plot the graph in text format 
 ##giving an ider how the structure looks like
-plotGraphStructure<-function(graph,indent='--'){
+plotGraphStructure<-function(graph,indent='--',text=c('name')){
   root<-findRoot(graph)
   levels<-buildLevels(graph)
   
   f<-function(graph,node){
     level<-levels$nodes2level[[node]]
     string=paste(rep(indent,level),collapse='')
-    cat(paste(string,node,"\n",sep=' '))
+    t=''
+    for(i in text){
+      t = c(t,get.node.attribute(graph,i,c(node)))
+    }
+    t=paste(t,collapse=' ')
+    cat(paste(string,t,"\n",sep=' '))
     cs<-findChildrenNodes(graph,node)
     if(length(cs)>0){
       for(i in cs){
