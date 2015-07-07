@@ -124,3 +124,26 @@ loadGraph<-function(edges_file,nodes_file){
 .listOfEnv2ListOfList<-function(listOfEnv){
   lapply(listOfEnv,ls)
 }
+
+
+##################################
+##plot the graph in text format 
+##giving an ider how the structure looks like
+plotGraphStructure<-function(graph,indent='--'){
+  root<-findRoot(graph)
+  levels<-buildLevels(graph)
+  
+  f<-function(graph,node){
+    level<-levels$nodes2level[[node]]
+    string=paste(rep(indent,level),collapse='')
+    cat(paste(string,node,"\n",sep=' '))
+    cs<-findChildrenNodes(graph,node)
+    if(length(cs)>0){
+      for(i in cs){
+        f(graph,i)
+      }
+    }
+  }
+  
+  f(graph,root)
+}
