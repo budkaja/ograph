@@ -25,6 +25,37 @@ treeplot<-function(graph,label=0,vertex.size=3,vertex.label.cex=1,edge.arrow.siz
   }
 }
 
+##similar to tree plot, but use interactive plotting. work only with small graph.
+##
+tktreeplot<-function(graph,label=0,vertex.size=3,vertex.label.cex=1,edge.arrow.size=0.2,edge.width=0.5,vertex.label.dist=0,vertex.label.degree=-pi/4,show.genes=FALSE,only.gene=FALSE,root='all'){
+  if(length(V(graph))>500){
+    die('too many nodes!')
+  }
+  graph<-reverseArch(graph)
+  
+  text=paste(V(graph)$name,V(graph)$def,sep="\n")
+  if(show.genes){
+    if(only.gene)
+      text=sapply(V(graph)$genes,length)
+    else
+      text=paste(text,sapply(V(graph)$genes,length),sep="\n")
+  }
+  
+  if(label==1){
+    #plot(graph,vertex.size=vertex.size,vertex.label.cex=vertex.label.cex,vertex.label=paste(V(graph)$name,V(graph)$name,sapply(V(graph)$genes,length),sep="\n"),edge.arrow.size=edge.arrow.size,edge.width=edge.width,edge.color='black',layout=layout.reingold.tilford(graph,flip.y=TRUE,root=which(V(graph)$name=='all')))
+    tkplot(graph,vertex.size=vertex.size,vertex.label.dist=vertex.label.dist,vertex.label.degree=vertex.label.degree,
+         vertex.label.cex=vertex.label.cex,
+         vertex.label=text,
+         edge.arrow.size=edge.arrow.size,
+         edge.width=edge.width,
+         edge.color='black',
+         layout=layout.reingold.tilford(graph,flip.y=TRUE,root=which(V(graph)$name==root)))
+  }else{
+    tkplot(graph,vertex.size=vertex.size,vertex.label=NA,edge.arrow.size=edge.arrow.size,edge.width=edge.width,edge.color='black',layout=layout.reingold.tilford(graph,flip.y=TRUE,root=which(V(graph)$name=='all')))
+  }
+}
+
+
 ##################################
 ##simple method to plot the tree with pre-defined parms
 nomalplot<-function(graph,label=0){
