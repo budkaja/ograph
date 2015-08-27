@@ -1,6 +1,15 @@
 ##################################
 ##simple method to plot the tree with pre-defined parms
-treeplot<-function(graph,label=0,vertex.size=3,vertex.label.cex=1,edge.arrow.size=0.2,edge.width=0.5,vertex.label.dist=0,vertex.label.degree=-pi/4,show.genes=FALSE,only.gene=FALSE,root='all'){
+treeplot<-function(graph,label=0,
+                   vertex.size=3,
+                   vertex.label.cex=1,
+                   edge.arrow.size=0.2,
+                   edge.width=0.5,
+                   vertex.label.dist=0,
+                   vertex.label.degree=-pi/4,
+                   show.genes=FALSE,
+                   only.gene=FALSE,
+                   root='all'){
   graph<-reverseArch(graph)
   
   text=paste(V(graph)$name,V(graph)$def,sep="\n")
@@ -73,8 +82,8 @@ nomalplot<-function(graph,label=0){
 ##plot2file(filename,width=50,heigth=20)
 ##plotSig(graph=g@graph,testresult=resultElimFis,number_of_node=50,label=1)
 ##dev.off()
-plotSig<-function(graph,value,label=1,number_of_node=0,...){
-  x=sort(testresult+0.00001)
+plotSig<-function(graph,value,number_of_node=0,...){
+  x=sort(value+10^-20)
   #x=sort(score(testresult))
   
   if(length(x)>number_of_node & number_of_node>0 )
@@ -91,7 +100,7 @@ plotSig<-function(graph,value,label=1,number_of_node=0,...){
   
   g=subGraphByNodes(graph,nodes=names(x))
   g=ograph::set.node.attribute(g,attr_name='color',attr_value=color,nodes=names(color))
-  treeplot(g,label=label,vertex.size=5,vertex.label.cex=1,...)
+  treeplot(g,...)
 }
 
 ##################################
@@ -102,12 +111,12 @@ plot2file<-function(filename,width=12,heigth=8,units='in',res=300){
 }
 
 ##################################
-##give in the result generate by topOnto statics test
 ##plot the wordcloud base on p-value
-plotWordcloud<-function(testresult,number_of_node=Inf,scale=c(3,0.1),filename,width=12,heigth=8,units='in',res=300){
+##value is a named vector with nodes and their values.
+plotWordcloud<-function(value,number_of_node=Inf,scale=c(3,0.1),filename,width=12,heigth=8,units='in',res=300){
   require(wordcloud)
   def=Term(ONTTERM)
-  x=sort(score(testresult))
+  x=sort(value+10^-20)
   y=-log(x)
   freq=y/sum(y)
   min.freq=sort(freq[freq>0])[1]
