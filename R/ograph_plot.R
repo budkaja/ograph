@@ -100,7 +100,6 @@ nomalplot<-function(graph,label=0){
 ##plotSig(graph=g@graph,testresult=resultElimFis,number_of_node=50,label=1)
 ##dev.off()
 plotSig<-function(graph,value,number_of_node=0,...){
-  
   #turn to numeric
   tmp<-names(value)
   value<-as.numeric(value)
@@ -114,11 +113,12 @@ plotSig<-function(graph,value,number_of_node=0,...){
   
   log.x=log10(x)
   
-  color <- round(log.x - range(log.x)[1] + 1)
-  colorMap <- heat.colors(max(color))
+  color <- round(log.x - range(log.x)[1] + 1,3)
+  index=unique(color)
+  colorMap <- heat.colors(length(index))
   
   color<-sapply(names(color),function(x){
-    colorMap[color[x]]
+    colorMap[which(index==color[x])]
   })
   
   g=subGraphByNodes(graph,nodes=names(x))
