@@ -17,6 +17,9 @@ treeplot<-function(graph,label=TRUE,label.nodes=c(),
 
   if(label){
     if(length(label.nodes)>0){
+      #always plot the first three level
+      default.nodes<-V(subGraphByLevel(reverseArch(graph),3))$name
+      label.nodes=unique(c(default.nodes,label.nodes))
       index<-which(V(graph)$name %in% label.nodes)
       label.text[index]=paste(V(graph)$name[index],V(graph)$def[index],sep="\n")
     }else{
@@ -97,6 +100,12 @@ nomalplot<-function(graph,label=0){
 ##plotSig(graph=g@graph,testresult=resultElimFis,number_of_node=50,label=1)
 ##dev.off()
 plotSig<-function(graph,value,number_of_node=0,...){
+  
+  #turn to numeric
+  tmp<-names(value)
+  value<-as.numeric(value)
+  names(value)<-tmp
+  
   x=sort(value+10^-20)
   #x=sort(score(testresult))
   
@@ -114,7 +123,7 @@ plotSig<-function(graph,value,number_of_node=0,...){
   
   g=subGraphByNodes(graph,nodes=names(x))
   g=ograph::set.node.attribute(g,attr_name='color',attr_value=color,nodes=names(color))
-  treeplot(g,...)
+  treeplot(g,label.nodes=names(x),...)
 }
 
 ##################################
