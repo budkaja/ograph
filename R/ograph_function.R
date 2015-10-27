@@ -241,6 +241,52 @@ shortest_path_to_root<-function(graph,node){
   V(graph)[nodes]$name
 }
 
+
+##################################
+## find node level
+##################################
+find.node.level<-function(graph,nodes=c()){
+  if(!is.nodes.in.graph(graph,nodes))
+    warning("some of the nodes are not in the graph!")
+  
+  l<-buildLevels(graph)
+  l$nodes2level[nodes]
+}
+
+##################################
+## check if the nodes are in the graph
+##################################
+is.nodes.in.graph<-function(graph,nodes=c()){
+  if(sum(!nodes %in% get.node.attribute(graph,'name'))>0)
+    FALSE
+  else
+    TRUE
+}
+##################################
+## check which the nodes are in the graph
+##################################
+which.node.in.graph<-function(graph,nodes=c()){
+  nodes %in% get.node.attribute(graph,'name')
+}
+
+##################################
+## check if the nodes are leaf nodes
+##################################
+is.leaf<-function(graph,nodes){
+  ln<-findLeafNode(graph)
+  r<-nodes %in% ln
+  names(r)<-nodes
+  r
+}
+
+##################################
+## set node color
+##################################
+set.node.color<-function(graph,nodes=c(),color){
+  set.node.attribute(graph,'color',color,nodes=nodes)
+}
+
+
 ##################################
 ## Get nodes attrs
 ##################################
@@ -336,8 +382,9 @@ findInducedSubGraphNodes <- function(graph,startNodes) {
 ############################   heat color node base on some value   ############################
 ## 
 colorMapNode<-function(graph,nodes,values){
+  values<-as.numeric(values)
   names(values)=nodes
-  x=sort(values+0.0000001)
+  x=sort(values+10^-20)
   
   log.x=log10(x)
   color <- round(log.x - range(log.x)[1] + 1)
@@ -353,7 +400,6 @@ colorMapNode<-function(graph,nodes,values){
 
 
 
-
 ############################   Debug function   ############################
 peekNode<-function(graph,node){
   node<-'DOID:10652'
@@ -363,3 +409,83 @@ peekNode<-function(graph,node){
     cat("\n\n")
   }
 }
+
+
+############################   Debug function   ############################
+to.latex<-function(topOntoresult,table.name='',table.des='',number_of_row=5){
+  #head(T1$GOBP_P)
+  #t<-T1$GOBP_P[1:5,]
+  
+  
+  
+  
+  if(number_of_row>nrow(topOntoresult))
+    number_of_row=nrow(topOntoresult)
+  
+  t<-topOntoresult[1:number_of_row,c(1,2,4,5,6,8,9)]
+  colnames(t)<-c("TERM.ID","TERM.NAME","Annotated","Significant","Expected","elim-p","p")
+  cat(s)
+  cat("\\begin{table}[ht]\n")
+  cat("\\rowcolors{2}{gray!25}{white}\n")
+  cat("{\\footnotesize")
+  cat("\n")
+  cat("\\begin{tabular}{*{2}{l}*{5}{c}}\n")
+  cat(paste(colnames(t),collapse="&"))
+  cat("\\\\")
+  cat("\n")
+  cat("\\hline")
+  cat("\n")
+  for(i in 1:nrow(t)){
+    cat(paste(t[i,],collapse="&"))
+    cat("\\\\")
+    cat("\n")
+  }
+  cat("\\end{tabular}\n")
+  cat("}")
+  cat(paste("\\caption{",table.des,"}\n",sep=""))
+  cat(paste("\\label{tab:",table.name,"}\n",sep=""))
+  cat("\\end{table}\n")
+}
+
+to.latex.content<-function(topOntoresult,number_of_row=5){
+ 
+  if(number_of_row>nrow(topOntoresult))
+    number_of_row=nrow(topOntoresult)
+  
+  t<-topOntoresult[1:number_of_row,c(1,2,4,5,6,8,9)]
+ 
+  for(i in 1:nrow(t)){
+    cat(paste(i,paste(t[i,],collapse="&"),sep="AAA"))
+    cat("\\\\")
+    cat("\n")
+  }
+
+}
+# to.latex(T1$GOBP_P,5)
+# topOntoresult=T1$GOBP_P
+# setwd('/home/xin/Desktop/usercase/fly/analysis/')
+# 
+# setwd('atowtt1pVSn')
+# T1<-new.env(hash = TRUE)
+# p.n<-readRDS('foldchange.rds')
+# p.n.enriched<-p.n[p.n$fc>1.5 & p.n$fdr<0.01,]
+# ##332(paper 330)
+# length(unique(p.n.enriched$entrez_id))
+# assign('p.n',p.n,T1)
+# assign('p.n.enriched',p.n.enriched,T1)
+# 
+# GOBP_P<-readRDS('topOnto/GOBP_T1P.rds')
+# assign('GOBP_P',GOBP_P[as.numeric(GOBP_P$elimfisher)<0.05,],T1)
+# GOBP_N<-readRDS('topOnto/GOBP_T1N.rds')
+# assign('GOBP_N',GOBP_N[as.numeric(GOBP_N$elimfisher)<0.05,],T1)
+# HDO_P<-readRDS('topOnto/HDO_T1P.rds')
+# assign('HDO_P',HDO_P[as.numeric(HDO_P$elimfisher)<0.05,],T1)
+# HDO_N<-readRDS('topOnto/HDO_T1N.rds')
+# assign('HDO_N',HDO_N[as.numeric(HDO_N$elimfisher)<0.05,],T1)
+# HPO_P<-readRDS('topOnto/HPO_T1P.rds')
+# assign('HPO_P',HPO_P[as.numeric(HPO_P$elimfisher)<0.05,],T1)
+# HPO_N<-readRDS('topOnto/HPO_T1N.rds')
+# assign('HPO_N',HPO_N[as.numeric(HPO_N$elimfisher)<0.05,],T1)
+# setwd('/home/xin/Desktop/usercase/fly/analysis/')
+# 
+

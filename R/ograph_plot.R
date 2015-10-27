@@ -99,7 +99,7 @@ nomalplot<-function(graph,label=0){
 ##plot2file(filename,width=50,heigth=20)
 ##plotSig(graph=g@graph,testresult=resultElimFis,number_of_node=50,label=1)
 ##dev.off()
-plotSig<-function(graph,value,number_of_node=0,...){
+plotSig<-function(graph,value,number_of_node=0,only.plot.sig=T,...){
   #turn to numeric
   tmp<-names(value)
   value<-as.numeric(value)
@@ -121,10 +121,19 @@ plotSig<-function(graph,value,number_of_node=0,...){
     colorMap[which(index==color[x])]
   })
   
-  g=subGraphByNodes(graph,nodes=names(x))
+  if(!exists('label.nodes'))
+    label.nodes=names(x)
+  
+  g=subGraphByNodes(graph,nodes=c(names(x),label.nodes))
   g=ograph::set.node.attribute(g,attr_name='color',attr_value=color,nodes=names(color))
-  treeplot(g,label.nodes=names(x),...)
+  
+  if(only.plot.sig)
+    treeplot(g,label.nodes=names(x),...)
+  else
+    treeplot(g,...) 
+  
 }
+
 
 ##################################
 ##function to plot the following graph into a file
@@ -136,16 +145,30 @@ plot2file<-function(filename,width=12,heigth=8,units='in',res=300){
 ##################################
 ##plot the wordcloud base on p-value
 ##value is a named vector with nodes and their values.
-plotWordcloud<-function(value,number_of_node=Inf,scale=c(3,0.1),filename,width=12,heigth=8,units='in',res=300){
+plotWordcloud<-function(value,number_of_node=Inf,scale=c(3,0.1),filename='',width=12,heigth=8,units='in',res=300){
   require(wordcloud)
   def=Term(ONTTERM)
+  
+  ns<-names(value)
+  value<-as.numeric(value)
+  names(value)<-ns
   x=sort(value+10^-20)
+  
+  if(!is.infinite(number_of_node)){
+    x=x[1:number_of_node]
+  }
+  
   y=-log(x)
   freq=y/sum(y)
   min.freq=sort(freq[freq>0])[1]
-  png(filename, width,heigth, units=units, res=res)
-  wordcloud(words=def[names(y)],freq=freq,scale=c(3,0.1),min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
-  dev.off() 
+  if(filename!=''){
+    png(filename, width,heigth, units=units, res=res)
+    wordcloud(words=def[names(y)],freq=freq,scale=c(3,0.1),min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
+    dev.off() 
+  }else{
+    wordcloud(words=def[names(y)],freq=freq,scale=c(3,0.1),min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
+  }
+
 }
 
 ###############################################
@@ -215,3 +238,81 @@ plotGraphStructure<-function(graph,indent='--',text=c('name')){
   
   f(graph,root)
 }
+
+
+
+################
+#method to turn an igraph to graphNEL
+.to.GraphNEL<-function(igraph){
+  
+  nel<-igraph.to.graphNEL(igraph)
+  nAttrs<-list()
+  
+  v.n <- list.vertex.attributes(igraph)
+  v.n <- v.n[v.n != "name"]
+  index<-get.vertex.attribute(igraph, 'name')
+  
+  for (n in v.n) {
+    nAttrs[[n]]<-unlist(nodeData(nel, attr = n))
+  }
+  
+  
+  dic<-c('color'='fillcolor')
+  names(nAttrs)<-unname(sapply(names(nAttrs),function(x){
+    if(is.na(dic[x]))
+      x
+    else
+      dic[x]
+  }))
+  
+  list(graph=nel,nodeAttrs=nAttrs)
+}
+
+################
+#method to turn an igraph to graphNEL and plot
+plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE){
+  r<-.to.GraphNEL(igraph)
+  nel<-r$graph
+  nodeAttrs<-r$nodeAttrs
+   
+  
+  node.names <- nodes(nel)
+  nodeAttrs$label <- paste(node.names,nodeAttrs$def, sep = " ")
+  names(nodeAttrs$label) <- node.names
+  
+#   nodeAttrs$shape<-'circle'
+#   nodeAttrs$height<-0.45
+  
+  ## we set the global Graphviz attributes
+  graphAttrs <- getDefaultAttrs(layoutType = 'dot')
+  graphAttrs$cluster <- NULL
+  
+  #graphAttrs$graph$splines <- FALSE
+  graphAttrs$graph$size <- "6.99,3.99"
+  
+  ## set the node shape
+#   graphAttrs$node$shape <- 'ellipse'
+  graphAttrs$node$shape <- 'circle'
+
+  
+  ## set the fontsize for the nodes labels
+  graphAttrs$node$fontsize <- '9'
+  graphAttrs$edge$fontsize <- '9'
+  graphAttrs$node$style <- 'filled'
+  graphAttrs$node$height <- '0.45'
+#   graphAttrs$node$width <- '1.5'
+  
+  if(!showEdges)
+    graphAttrs$edge$color <- 'white'
+  else
+    ## if we want to differentiate between 'part-of' and 'is-a' edges
+    ##    0 for a is_a relation,  1 for a part_of relation
+    ##  edgeAttrs$color <- ifelse(.getEdgeWeights(dag) == 0, 'black', 'red')
+    graphAttrs$edge$color <- 'black'
+  
+  
+  plot(reverseEdgeDirections(nel),nodeAttrs = nodeAttrs,attrs=graphAttrs)
+}
+
+
+
