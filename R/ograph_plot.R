@@ -102,6 +102,7 @@ nomalplot<-function(graph,label=0){
 plotSig<-function(graph,value,number_of_node=0,only.plot.sig=T,...){
   #turn to numeric
   tmp<-names(value)
+  value<-sub(pattern='< 1e-30',replacement='1e-30',x=value)
   value<-as.numeric(value)
   names(value)<-tmp
   
@@ -150,6 +151,7 @@ plotWordcloud<-function(value,number_of_node=Inf,scale=c(3,0.1),filename='',widt
   def=Term(ONTTERM)
   
   ns<-names(value)
+  value<-sub(pattern='< 1e-30',replacement='1e-30',x=value)
   value<-as.numeric(value)
   names(value)<-ns
   x=sort(value+10^-20)
@@ -163,12 +165,11 @@ plotWordcloud<-function(value,number_of_node=Inf,scale=c(3,0.1),filename='',widt
   min.freq=sort(freq[freq>0])[1]
   if(filename!=''){
     png(filename, width,heigth, units=units, res=res)
-    wordcloud(words=def[names(y)],freq=freq,scale=c(3,0.1),min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
+    wordcloud(words=def[names(y)],freq=freq,scale=scale,min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
     dev.off() 
   }else{
-    wordcloud(words=def[names(y)],freq=freq,scale=c(3,0.1),min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
+    wordcloud(words=def[names(y)],freq=freq,scale=scale,min.freq=min.freq,random.order=FALSE, max.words=Inf,rot.per=0, use.r.layout=FALSE, colors=brewer.pal(8, 'Dark2'))
   }
-
 }
 
 ###############################################

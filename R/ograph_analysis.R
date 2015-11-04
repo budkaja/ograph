@@ -184,3 +184,49 @@ calculate.upper.adj.matrix2<-function(graph,leaf_only=FALSE){
   
   m
 }
+
+
+
+disease.2.disease<-function(geneID2TERM,out.d2d=NULL,out.d2g=NULL){
+#   require(ograph)
+#   library(topOnto) 
+#   topOnto::initONT('HDO')
+#   geneID2TERM <- readMappings(file = system.file("extdata/annotation","human_gene2HDO_o", package ="topOnto"))
+#   disease.2.disease(geneID2TERM,out.d2d='~/Desktop/d2d.rds',out.d2g='~/Desktop/d2g.rds')
+#   
+start.time <- Sys.time()
+
+
+geneID2TERM<-geneID2TERM
+TERM2geneID<-revmap(geneID2TERM)
+diseases<-names(TERM2geneID)
+genes<-names(geneID2TERM)
+
+
+print('calculating d2g matrix...')
+d2g<-matrix(c(0),nrow=length(diseases),ncol=length(genes),dimnames=list(diseases,genes))
+for(i in diseases){
+  for(j in TERM2geneID[[i]]){
+    d2g[i,j]=1
+  }
+}
+
+print("calculating d2d matrix...")
+d2d<-matrix(c(0),nrow=length(diseases),ncol=length(diseases),dimnames=list(diseases,diseases))
+for(k in 1:length(genes)){
+  t<-diseases[which(d2g[,k]!=0)]
+  if(length(t>1)){
+    for(i in 1:length(t)){
+      for(j in i:length(t)){
+        d2d[t[i],t[j]] = d2d[t[i],t[j]]+1
+      }
+    }
+  }  
+}
+
+end.time <- Sys.time()
+print(end.time - start.time)
+
+saveRDS(object=d2d,file=out.d2d)
+saveRDS(object=d2g,file=out.d2g)
+}

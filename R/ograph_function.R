@@ -382,8 +382,10 @@ findInducedSubGraphNodes <- function(graph,startNodes) {
 ############################   heat color node base on some value   ############################
 ## 
 colorMapNode<-function(graph,nodes,values){
+  values<-sub(pattern='< 1e-30',replacement='1e-30',x=values)
   values<-as.numeric(values)
   names(values)=nodes
+  
   x=sort(values+10^-20)
   
   log.x=log10(x)
@@ -461,6 +463,10 @@ to.latex.content<-function(topOntoresult,number_of_row=5){
   }
 
 }
+
+
+
+
 # to.latex(T1$GOBP_P,5)
 # topOntoresult=T1$GOBP_P
 # setwd('/home/xin/Desktop/usercase/fly/analysis/')
