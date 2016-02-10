@@ -242,6 +242,47 @@ shortest_path_to_root<-function(graph,node){
 }
 
 
+
+##################################
+## find path between two nodes
+##################################
+shortest_path<-function(graph,node1,node2,levels,self.includ=TRUE){  
+  path.down=list()
+  path.up=c()
+  ##going down
+  c1<-findAllChildrenNodes(graph,node1)
+  c2<-findAllChildrenNodes(graph,node2)
+  common.children<-intersect(c1,c2)
+  if(length(common.children)>0){
+    for(i in common.children){
+      path.to.c1<-V(graph)[get.shortest.paths(graph,from=V(graph)[i],to=V(graph)[node1],mode='out',output='vpath')[['vpath']][[1]]]$name
+      path.to.c2<-V(graph)[get.shortest.paths(graph,from=V(graph)[i],to=V(graph)[node2],mode='out',output='vpath')[['vpath']][[1]]]$name
+      if(self.includ)
+        path.down[[i]]=unique(c(path.to.c1,path.to.c2))
+      else
+        path.down[[i]]=setdiff(unique(c(path.to.c1,path.to.c2)),c(node1,node2))
+    }
+  }
+  
+  ##going up
+  c1<-shortest_path_to_root(graph,node1)
+  c2<-shortest_path_to_root(graph,node2)
+  common.parents<-intersect(c1,c2)
+  if(length(common.parents)>0){
+    deepest.common.parent<-names(which.max(unlist(levels$nodes2level[common.parents])))
+    path.to.c1<-V(graph)[get.shortest.paths(graph,from=V(graph)[deepest.common.parent],to=V(graph)[node1],mode='in',output='vpath')[['vpath']][[1]]]$name
+    path.to.c2<-V(graph)[get.shortest.paths(graph,from=V(graph)[deepest.common.parent],to=V(graph)[node2],mode='in',output='vpath')[['vpath']][[1]]]$name
+    if(self.includ)
+      path.up<-unique(c(path.to.c1,path.to.c2))
+    else
+      path.up<-setdiff(unique(c(path.to.c1,path.to.c2)),c(node1,node2))
+  }
+  list('up'=path.up,'down'=path.down)
+}
+
+
+
+
 ##################################
 ## find node level
 ##################################

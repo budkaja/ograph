@@ -269,16 +269,18 @@ plotGraphStructure<-function(graph,indent='--',text=c('name')){
   list(graph=nel,nodeAttrs=nAttrs)
 }
 
+
 ################
 #method to turn an igraph to graphNEL and plot
-plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE){
+plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE,node.shape='circle',node.fontsize = 9,edge.fontsize = 9,node.height = 0.45){
+  require(Rgraphviz)
   r<-.to.GraphNEL(igraph)
   nel<-r$graph
   nodeAttrs<-r$nodeAttrs
    
   
   node.names <- nodes(nel)
-  nodeAttrs$label <- paste(node.names,nodeAttrs$def, sep = " ")
+  nodeAttrs$label <- paste(node.names,nodeAttrs$def, sep = "\n")
   names(nodeAttrs$label) <- node.names
   
 #   nodeAttrs$shape<-'circle'
@@ -293,14 +295,14 @@ plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE){
   
   ## set the node shape
 #   graphAttrs$node$shape <- 'ellipse'
-  graphAttrs$node$shape <- 'circle'
+  graphAttrs$node$shape <- node.shape
 
   
   ## set the fontsize for the nodes labels
-  graphAttrs$node$fontsize <- '9'
-  graphAttrs$edge$fontsize <- '9'
+  graphAttrs$node$fontsize <- node.fontsize
+  graphAttrs$edge$fontsize <- edge.fontsize
   graphAttrs$node$style <- 'filled'
-  graphAttrs$node$height <- '0.45'
+  graphAttrs$node$height <- node.height
 #   graphAttrs$node$width <- '1.5'
   
   if(!showEdges)
