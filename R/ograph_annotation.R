@@ -291,3 +291,22 @@ entrez2symbol<-function(file=''){
 #   }
 # }
 
+
+
+.getTermsDefinition <- function(igraph,whichTerms, numChar = 20, multipLines = FALSE) {
+  
+  termsNames=ograph@term2def[whichTerms]
+  
+  if(!multipLines) 
+    shortNames <- paste(substr(termsNames, 1, numChar),
+                        ifelse(nchar(termsNames) > numChar, '...', ''), sep = '')
+  else
+    shortNames <- sapply(termsNames,
+                         function(x) {
+                           a <- strwrap(x, numChar)
+                           return(paste(a, sep = "", collapse = "\\\n"))
+                         })
+  
+  names(shortNames) <- names(termsNames)
+  return(shortNames[whichTerms])
+}

@@ -12,7 +12,9 @@ setClass("ontGraph",
            ##node level list
            levels = "ANY",
            ##color2level
-           color2level = "ANY"
+           color2level = "ANY",
+           ##term id2def
+           term2def = "ANY"
          )
 )
 
@@ -20,6 +22,9 @@ setMethod("initialize", "ontGraph",function(.Object,ontgraph=NULL,ontology='HDO'
   
   .Object@ontology<-ontology
   #.Object@description<-description
+  
+  initOGraph(ontology = ontology)
+  .Object@term2def=Term(ONTTERM)
   
   ##build the ontology
   if(!is.null(ontgraph)){
@@ -40,7 +45,7 @@ setMethod("initialize", "ontGraph",function(.Object,ontgraph=NULL,ontology='HDO'
   .Object@graph<-node.addLeafAttribute(.Object@graph)
   .Object@graph<-node.addColorAttributeByLevel(.Object@graph)
   
- 
+  
   
   ##.Object@graph
   .Object@color2level=rainbow(.Object@levels$noOfLevels)

@@ -1,29 +1,28 @@
-library('topOnto')
-topOnto::initONT('HDO')
-
-a<-system.file("extdata/annotation","human_gene2HDO", package ="topOnto")
-g<-system.file("extdata/genelist","age", package ="topOnto")
-
-geneID2GO <- readMappings(file = a)
-geneNames=names(geneID2GO)
-myInterestingGenes=(read.csv(header = FALSE, file = g))$V1
-geneList <- factor(as.integer(geneNames %in% myInterestingGenes))
-names(geneList) <- geneNames
-
-
-GOdata <- new("topGOdata", ontology = "HDO", allGenes = geneList,annot = annFUN.gene2GO, gene2GO = geneID2GO)
-resultFis <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
-resultElimFis<- runTest(GOdata, algorithm = "elim", statistic = "fisher")
-allRes <- GenTable(GOdata,  elim = resultElimFis,elim = resultElimFis,topNodes = 30,useLevels=TRUE)
-print(allRes)
-
-
-ts=names(sort(pValue.classic)[1:10])
+# library('topOnto')
+# topOnto::initONT('HDO')
+# 
+# a<-system.file("extdata/annotation","human_gene2HDO", package ="topOnto")
+# g<-system.file("extdata/genelist","age", package ="topOnto")
+# 
+# geneID2GO <- readMappings(file = a)
+# geneNames=names(geneID2GO)
+# myInterestingGenes=(read.csv(header = FALSE, file = g))$V1
+# geneList <- factor(as.integer(geneNames %in% myInterestingGenes))
+# names(geneList) <- geneNames
+# 
+# 
+# GOdata <- new("topGOdata", ontology = "HDO", allGenes = geneList,annot = annFUN.gene2GO, gene2GO = geneID2GO)
+# resultFis <- runTest(GOdata, algorithm = "classic", statistic = "fisher")
+# resultElimFis<- runTest(GOdata, algorithm = "elim", statistic = "fisher")
+# allRes <- GenTable(GOdata,  elim = resultElimFis,elim = resultElimFis,topNodes = 30,useLevels=TRUE)
+# print(allRes)
+# 
+# 
+# ts=names(sort(pValue.classic)[1:10])
 
 
 
 library('ograph')
-ograph::initOGraph('HDO')
 g<-new("ontGraph",ontology='HDO')
 mg<-ograph::subGraphByNodes(graph=g@graph,ts)
 treeplot(mg,label=1)
@@ -70,7 +69,6 @@ sink()
 
 
 library('ograph')
-ograph::initOGraph('HDO')
 g<-new("ontGraph",ontology='HDO')
 mg<-subGraphByNodes(g@graph,nodes=c('DOID:10652'))
 mg<-mapGene2Graph(mg,file=system.file("extdata/annotation","human_gene2HDO", package ="topOnto"))
