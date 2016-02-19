@@ -272,7 +272,7 @@ plotGraphStructure<-function(graph,indent='--',text=c('name')){
 
 ################
 #method to turn an igraph to graphNEL and plot
-plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE,node.shape='circle',node.fontsize = 9,edge.fontsize = 9,node.height = 0.45,label.only.def=T){
+plot.graphNEL<-function(igraph,term2def,label=FALSE,showEdges = TRUE,node.shape='circle',node.fontsize = 9,edge.fontsize = 9,node.height = 0.45,label.only.def=T){
   require(Rgraphviz)
   r<-.to.GraphNEL(igraph)
   nel<-r$graph
@@ -281,7 +281,7 @@ plot.graphNEL<-function(igraph,label=FALSE,showEdges = TRUE,node.shape='circle',
   
   node.names <- nodes(nel)
   if(label.only.def==1)
-    nodeAttrs$label <- .getTermsDefinition(igraph,node.names,multipLines=T)
+    nodeAttrs$label <- .getTermsDefinition(term2def,node.names,multipLines=T)
   else
     nodeAttrs$label <- paste(node.names,nodeAttrs$def, sep = "\\\n")
   names(nodeAttrs$label) <- node.names

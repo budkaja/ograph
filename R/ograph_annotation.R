@@ -293,9 +293,9 @@ entrez2symbol<-function(file=''){
 
 
 
-.getTermsDefinition <- function(igraph,whichTerms, numChar = 20, multipLines = FALSE) {
+.getTermsDefinition <- function(term2def,whichTerms, numChar = 20, multipLines = FALSE) {
   
-  termsNames=ograph@term2def[whichTerms]
+  termsNames=term2def[whichTerms]
   
   if(!multipLines) 
     shortNames <- paste(substr(termsNames, 1, numChar),
