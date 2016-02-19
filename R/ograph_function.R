@@ -343,8 +343,14 @@ get.node.attribute<-function(graph,attr,nodes=c()){
   
   retValue <- get.vertex.attribute(graph, attr,nodes )
   
+  
+  if(is.environment(retValue[[1]]))
+    return('')
+  
   if(length(retValue) == 1)
     return(retValue[[1]])
+  
+    
   
   return(retValue)
 }
@@ -445,7 +451,6 @@ colorMapNode<-function(graph,nodes,values){
 
 ############################   Debug function   ############################
 peekNode<-function(graph,node){
-  node<-'DOID:10652'
   attrs<-list.vertex.attributes(graph)
   for(attr in attrs){
     cat(paste(attr,get.node.attribute(graph,attr,node),sep=":"))

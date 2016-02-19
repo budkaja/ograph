@@ -2,11 +2,12 @@
 title: "oGraph"
 author: "Xin He"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-%\VignetteIndexEntry{oGraph}
-%\VignetteEngine{knitr::rmarkdown}
-\usepackage[utf8]{inputenc}
+output: rmarkdown::pdf_document
+#rmarkdown::html_vignette,
+# vignette: >
+# %\VignetteIndexEntry{oGraph}
+# %\VignetteEngine{knitr::rmarkdown}
+# \usepackage[utf8]{inputenc}
 ---
   
 # Overview
@@ -24,74 +25,143 @@ A typical session can be divided into two steps:
 
 Here are example vignettes:
 
-```{r 1,message=FALSE}
+Load the package and see what ontology packages are available in you current .libPaths()
+```{r 1,message=FALSE,warning=FALSE,echo=TRUE}
 library('ograph')
-ograph::initOGraph('HDO')
+ograph::initWHAT()
 ```
 
-```{r 2,message=FALSE}
+init the **ontGraph** object. 
+```{r 2,message=FALSE,warning=FALSE}
 ontGraph<-new("ontGraph",ontology='HDO')
 print(ontGraph)
+```
+The ontGraph object contains the 'DAG', 'level'  and 'termid2def' mapping. You can access these properties by using '@'.
+
+```{r,echo=TRUE}
+levels<-ontGraph@levels
+head(levels$nodes2level)
+```
+
+############################################################################################
+The most important object is the 'DAG' object.
+```{r,echo=TRUE}
 g=ontGraph@graph
-root=findRoot(graph=g)
-leaves=findLeafNode(graph=g)
-treeplot(g,label=0)
-
-nodes=shortest_path_to_root(graph=g,node='DOID:10652')
-g2=set.node.attribute(g,attr_name='color',attr_value='red',nodes=nodes)
-treeplot(g2,label=0)
+g
 ```
-</center>
 
+############################################################################################
+A complete list of functions can be found by running:
+```{r,echo=TRUE}
+ls('package:ograph')
+```
 
-```{r}
+############################################################################################
+A set of functions are designed to manipulate this **igrph** object reporesenting the ontology 'DAG':
+First let's plot the graph
+```{r,echo=TRUE}
+treeplot(g,label = F)
+```
+
+############################################################################################
+This graph is too big, we will use a subgraph that seeded from c('DOID:10652','DOID:14330')
+```{r,echo=TRUE}
+g<-subGraphByNodes(g,c('DOID:10652','DOID:14330'))
+##plot again
+treeplot(g,label = T)
+nomalplot(g,label = T)
+plot.graphNEL(g,term2def = ontGraph@term2def)
+```
+
+############################################################################################
+We can change the node attributes
+```{r,echo=TRUE}
+list.vertex.attributes(g)
+g<-set.node.attribute(graph = g,attr_name = 'color',attr_value = 'red',nodes = c('DOID:10652'))
+get.node.attribute(g,'color')
+##replot
+treeplot(g,T)
+```
+
+############################################################################################
+We want to know the path between two node:
+```{r,echo=TRUE}
+##to root
+nodes2root<-shortest_path_to_root(graph=g,node='DOID:10652')
+g<-set.node.attribute(graph = g,attr_name = 'color',attr_value = 'red',nodes = nodes2root)
+treeplot(g,T)
+##to another node
+node2node<-shortest_path(g,'DOID:10652','DOID:14330',levels = ontGraph@levels,self.includ = T)
+##node2node contains two object, up and down. This is two route going from node A to node B. In this case, there is only a route 
+##connecting these two node by going up the tree
+node2node
+g<-set.node.attribute(graph = g,attr_name = 'color',attr_value = 'green',nodes = node2node$up)
+treeplot(g,T)
+```
+
+############################################################################################
+We are interested in getting all the children/parents nodes:
+```{r,echo=TRUE}
+##direct parents/children
+findChildrenNodes(g,'DOID:1289')
+findParentNodes(g,'DOID:1289')
+##all parents/children
+findAllChildrenNodes(g,'DOID:1289')
+findAllParentNodes(g,'DOID:1289')
+```
+
+############################################################################################
+We want to create a sub 'DAG' with a set of interesting nodes. We are using a seed node c('DOID:150') and we need to work first on the full graph.
+```{r,echo=TRUE}
+g<-ontGraph@graph
+nodes<-c('DOID:150')
+cs<-findAllChildrenNodes(g,nodes)
+cs
+sub<-subGraphByNodes(g,cs)
+sub
+treeplot(sub,F)
+```
+
+############################################################################################
+We want to take all the node in this sub 'DAG' for clipping?
+```{r,echo=TRUE}
+get.node.attribute(sub,attr = 'name')
+```
+
+############################################################################################
+Other functions:
+```{r,echo=TRUE}
+findRoot(graph=g)
+leaves<-findLeafNode(graph=g)
 subg<-subGraphByLevel(graph=g,l=3)
-treeplot(subg,label=1)
-```
-  
-```{r}
-terms=c('DOID:10652','DOID:14330')
-list.vertex.attributes(graph=g)
-get.node.attribute(g,attr='def',nodes=terms)
-subg<-subGraphByNodes(graph=g,nodes=terms)
-treeplot(subg,label=1)
+subg
 ```
 
 
-```{r}
-subg=mapGene2Graph(graph=subg,file=system.file("extdata","human_gene2HDO_o", package ="ograph"))
-treeplot(subg,label=1,show.genes=TRUE)
+############################################################################################
+```{r,echo=TRUE}
+sub=mapGene2Graph(graph=sub,file=system.file("extdata","human_gene2HDO_o", package ="ograph"),rollup = T)
+treeplot(subGraphByLevel(sub,3),label=1,show.genes=TRUE)
 ```
 
-
-```{r}
+############################################################################################
+```{r,echo=TRUE}
 term='DOID:150'
-get.node.attribute(g,attr='def',nodes=term)
-peekNode(g,node=term)
-
-findParentNodes(graph=g,node=term)
-findChildrenNodes(graph=g,node=term)
-
-cs=findAllChildrenNodes(g,term)
-g.cs=subGraphByNodes(graph=g,nodes=cs,include_path_to_root=TRUE)
-treeplot(g.cs,label=0)
-
-ps=findAllParentNodes(g,term)
-g.ps=subGraphByNodes(graph=g,nodes=ps,include_path_to_root=TRUE)
-treeplot(g.ps,label=1)
+get.node.attribute(sub,attr='def',nodes=term)
+peekNode(sub,node=term)
 ```
 
+############################################################################################
+We can search keyword in ontology terms.
+```{r,echo=TRUE}
+clip_neuro<-unique(c(searchDescription4Keyword(graph=g,keys=c('neuro')),searchName4Keyword(g,keys=c('neuro'))))
+head(get.node.attribute(g,attr='def',clip_neuro))
+clip_brain=unique(c(searchDescription4Keyword(graph=g,keys=c('brain')),searchName4Keyword(g,keys=c('brain'))))
+head(get.node.attribute(g,attr='def',clip_neuro))
 
-```{r}
-clip_neuro=searchDescription4Keyword(graph=g,keys=c('neuro'))
-names=searchName4Keyword(g,keys=c('neuro'))
-get.node.attribute(g,attr='def',names)
-
-clip_brain=searchDescription4Keyword(graph=g,keys=c('brain'))
 g.clip=subGraphByNodes(g,nodes=unique(c(clip_brain,clip_neuro)))
 g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='green',nodes=clip_neuro)
 g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='blue',nodes=clip_brain)
 g.clip=set.node.attribute(graph=g.clip,attr_name='color',attr_value='red',nodes=intersect(clip_brain,clip_neuro))
-
 treeplot(g.clip,label=0)
 ```
