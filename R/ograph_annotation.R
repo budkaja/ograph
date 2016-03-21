@@ -250,7 +250,6 @@ rollUpToLevel<-function(graph,mode=2,level=5){
 # output gene annotation from graph
 saveAnnotationFromGraph<-function(graph,file){
   sink(file)
-  graph=subg
   allnodes=V(graph)$name
   GO2geneID=.get.genesInNodes(graph,allnodes)
   for(i in allnodes){
