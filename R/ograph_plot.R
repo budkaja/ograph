@@ -322,3 +322,23 @@ plot.graphNEL<-function(igraph,term2def,label=FALSE,showEdges = TRUE,node.shape=
 
 
 
+plot.text<-function(graph,indent.symbol='.'){
+  levels<-buildLevels(graph)
+  root<-findRoot(graph)
+  .plot.text.node(graph,levels,root,indent.symbol)
+  
+  levels$level2nodes
+}
+
+.plot.text.node<-function(graph,levels,node,indent.symbol='-'){
+  indent=rep(indent.symbol,levels$nodes2level[[node]])
+  cat(indent,node,"\t",get.node.attribute(graph,'def',node),"\n",sep = '')
+  cs<-findChildrenNodes(graph,node)
+  if(length(cs)>0){
+    for(c in cs){
+      .plot.text.node(graph,levels,c,indent.symbol)
+    }
+  }
+}
+
+

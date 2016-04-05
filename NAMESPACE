@@ -12,5 +12,5 @@ export(buildOntGraph,buildLevels,
        reverseArch,findInducedSubGraphNodes,
        mapGene2Graph,mapGene2Graph2,rollUpAnnotation,rollUpAnnotation2,.get.genesInNodes,rollUpToLevel,
        treeplot,nomalplot,peekNode,entrez2symbol,plotGraphStructure,tktreeplot,
-       find.node.level,is.nodes.in.graph,which.node.in.graph,is.leaf,shortest_path
+       find.node.level,is.nodes.in.graph,which.node.in.graph,is.leaf,shortest_path,plot.text
   )
