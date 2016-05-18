@@ -342,11 +342,11 @@ get.node.attribute<-function(graph,attr,nodes=c()){
   }
   
   retValue <- get.vertex.attribute(graph, attr,nodes )
-  
-  
-  if(is.environment(retValue[[1]]))
-    return('')
-  
+  # 
+  # 
+  # if(is.environment(retValue[[1]]))
+  #   return('')
+  # 
   if(length(retValue) == 1)
     return(retValue[[1]])
   

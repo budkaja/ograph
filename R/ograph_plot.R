@@ -326,8 +326,6 @@ plot.text<-function(graph,indent.symbol='.'){
   levels<-buildLevels(graph)
   root<-findRoot(graph)
   .plot.text.node(graph,levels,root,indent.symbol)
-  
-  levels$level2nodes
 }
 
 .plot.text.node<-function(graph,levels,node,indent.symbol='-'){
